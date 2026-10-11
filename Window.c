@@ -723,7 +723,7 @@ font_messup:
     font_width = pick_width;
 
 #define f(i,c,w,u) \
-    fonts[i] = CreateFont (font_height, pick_width, 0, 0, w, FALSE, u, FALSE, \
+    fonts[i] = CreateFont (font_height, font_width, 0, 0, w, FALSE, u, FALSE, \
 			   c, OUT_DEFAULT_PRECIS, \
 		           CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, \
 			   FIXED_PITCH | FF_DONTCARE, cfg.font)
@@ -734,11 +734,7 @@ font_messup:
 	SelectObject (hdc, fonts[FONT_NORMAL]);
 	GetTextMetrics(hdc, &tm); 
 	font_height = tm.tmHeight;
-	{
-	    SIZE sz;
-	    GetTextExtentPoint32(hdc, "M", 1, &sz);
-	    font_width = sz.cx;
-	}
+	font_width = tm.tmAveCharWidth;
 
 	f(FONT_UNDERLINE, cfg.fontcharset, fw_dontcare, TRUE);
 
@@ -808,11 +804,7 @@ font_messup:
 	SelectObject (hdc, fonts[FONT_OEM]);
 	GetTextMetrics(hdc, &tm); 
 	font_height = tm.tmHeight;
-	{
-	    SIZE sz;
-	    GetTextExtentPoint32(hdc, "M", 1, &sz);
-	    font_width = sz.cx;
-	}
+	font_width = tm.tmAveCharWidth;
 
 	f(FONT_OEMUND, cfg.fontcharset, fw_dontcare, TRUE);
 
@@ -831,11 +823,8 @@ font_messup:
     for (i=0; i<8; i++) {
 	if (fonts[i]) {
 	    if (SelectObject (hdc, fonts[i]) &&
-	        GetTextMetrics(hdc, &tm) ) {
-	         SIZE sz;
-	         GetTextExtentPoint32(hdc, "M", 1, &sz);
-	         fsize[i] = sz.cx + 256 * tm.tmHeight;
-	    }
+	        GetTextMetrics(hdc, &tm) )
+	         fsize[i] = tm.tmAveCharWidth + 256 * tm.tmHeight;
 	    else fsize[i] = -i;
 	}
 	else fsize[i] = -i;
@@ -1721,7 +1710,7 @@ void do_text (Context ctx, int x, int y, char *text, int len,
     line_box.top    = y;
     line_box.right  = x+fnt_width*len;
     line_box.bottom = y+font_height;
-    ExtTextOut (hdc, x, y, ETO_CLIPPED|ETO_OPAQUE, &line_box, text, len, IpDx);
+    ExtTextOut (hdc, x, y, ETO_CLIPPED|ETO_OPAQUE, &line_box, text, len, NULL);
     if (bold_mode == BOLD_SHADOW && (attr & ATTR_BOLD)) {
 	SetBkMode (hdc, TRANSPARENT);
 
@@ -1732,7 +1721,7 @@ void do_text (Context ctx, int x, int y, char *text, int len,
 	* Or ... I could do a test print with "W", and use +1 or -1 for this
 	* shift depending on if the leftmost column is blank...
 	*/
-        ExtTextOut (hdc, x-1, y, ETO_CLIPPED, &line_box, text, len, IpDx);
+        ExtTextOut (hdc, x-1, y, ETO_CLIPPED, &line_box, text, len, NULL);
     }
     if (force_manual_underline || 
 	    (und_mode == UND_LINE && (attr & ATTR_UNDER))) {
