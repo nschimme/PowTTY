@@ -723,7 +723,7 @@ font_messup:
     font_width = pick_width;
 
 #define f(i,c,w,u) \
-    fonts[i] = CreateFont (font_height, font_width, 0, 0, w, FALSE, u, FALSE, \
+    fonts[i] = CreateFont (font_height, pick_width, 0, 0, w, FALSE, u, FALSE, \
 			   c, OUT_DEFAULT_PRECIS, \
 		           CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, \
 			   FIXED_PITCH | FF_DONTCARE, cfg.font)
@@ -734,7 +734,11 @@ font_messup:
 	SelectObject (hdc, fonts[FONT_NORMAL]);
 	GetTextMetrics(hdc, &tm); 
 	font_height = tm.tmHeight;
-	font_width = tm.tmAveCharWidth;
+	{
+	    SIZE sz;
+	    GetTextExtentPoint32(hdc, "M", 1, &sz);
+	    font_width = sz.cx;
+	}
 
 	f(FONT_UNDERLINE, cfg.fontcharset, fw_dontcare, TRUE);
 
@@ -804,7 +808,11 @@ font_messup:
 	SelectObject (hdc, fonts[FONT_OEM]);
 	GetTextMetrics(hdc, &tm); 
 	font_height = tm.tmHeight;
-	font_width = tm.tmAveCharWidth;
+	{
+	    SIZE sz;
+	    GetTextExtentPoint32(hdc, "M", 1, &sz);
+	    font_width = sz.cx;
+	}
 
 	f(FONT_OEMUND, cfg.fontcharset, fw_dontcare, TRUE);
 
