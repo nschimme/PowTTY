@@ -729,12 +729,14 @@ font_messup:
 			   FIXED_PITCH | FF_DONTCARE, cfg.font)
 
     if (cfg.vtmode != VT_OEMONLY) {
+	SIZE sz;
 	f(FONT_NORMAL, cfg.fontcharset, fw_dontcare, FALSE);
 
 	SelectObject (hdc, fonts[FONT_NORMAL]);
 	GetTextMetrics(hdc, &tm); 
 	font_height = tm.tmHeight;
-	font_width = tm.tmAveCharWidth;
+	GetTextExtentPoint32(hdc, "M", 1, &sz);
+	font_width = sz.cx;
 
 	f(FONT_UNDERLINE, cfg.fontcharset, fw_dontcare, TRUE);
 
@@ -799,12 +801,14 @@ font_messup:
     }
     else
     {
+	SIZE sz;
 	f(FONT_OEM, cfg.fontcharset, fw_dontcare, FALSE);
 
 	SelectObject (hdc, fonts[FONT_OEM]);
 	GetTextMetrics(hdc, &tm); 
 	font_height = tm.tmHeight;
-	font_width = tm.tmAveCharWidth;
+	GetTextExtentPoint32(hdc, "M", 1, &sz);
+	font_width = sz.cx;
 
 	f(FONT_OEMUND, cfg.fontcharset, fw_dontcare, TRUE);
 
