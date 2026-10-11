@@ -734,7 +734,7 @@ font_messup:
 
 	SelectObject (hdc, fonts[FONT_NORMAL]);
 	GetTextMetrics(hdc, &tm); 
-	font_height = tm.tmHeight;
+	font_height = tm.tmHeight + tm.tmExternalLeading;
 	GetTextExtentPoint32(hdc, "M", 1, &sz);
 	font_width = sz.cx;
 
@@ -806,7 +806,7 @@ font_messup:
 
 	SelectObject (hdc, fonts[FONT_OEM]);
 	GetTextMetrics(hdc, &tm); 
-	font_height = tm.tmHeight;
+	font_height = tm.tmHeight + tm.tmExternalLeading;
 	GetTextExtentPoint32(hdc, "M", 1, &sz);
 	font_width = sz.cx;
 
