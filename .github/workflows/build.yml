@@ -17,6 +17,8 @@ jobs:
 
       - name: Setup MSVC Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
 
       - name: Build with NMake
         run: nmake powtty.exe
