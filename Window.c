@@ -738,6 +738,10 @@ font_messup:
 	GetTextExtentPoint32(hdc, "M", 1, &sz);
 	font_width = sz.cx;
 
+	DeleteObject(fonts[FONT_NORMAL]);
+	f(FONT_NORMAL, cfg.fontcharset, fw_dontcare, FALSE);
+	SelectObject (hdc, fonts[FONT_NORMAL]);
+
 	f(FONT_UNDERLINE, cfg.fontcharset, fw_dontcare, TRUE);
 
         /*
@@ -809,6 +813,10 @@ font_messup:
 	font_height = tm.tmHeight + tm.tmExternalLeading;
 	GetTextExtentPoint32(hdc, "M", 1, &sz);
 	font_width = sz.cx;
+
+	DeleteObject(fonts[FONT_OEM]);
+	f(FONT_OEM, cfg.fontcharset, fw_dontcare, FALSE);
+	SelectObject (hdc, fonts[FONT_OEM]);
 
 	f(FONT_OEMUND, cfg.fontcharset, fw_dontcare, TRUE);
 
