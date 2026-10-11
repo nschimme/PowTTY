@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -23,3 +26,16 @@ jobs:
         with:
           name: powtty-exe
           path: powtty.exe
+
+      - name: Create or update rolling beta release
+        if: github.event_name == 'push'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "beta"
+          name: "Beta Build"
+          body: "Rolling beta release with the latest changes."
+          prerelease: true
+          allowUpdates: true
+          recreateRelease: true
+          artifacts: "powtty.exe"
+          token: ${{ secrets.GITHUB_TOKEN }}

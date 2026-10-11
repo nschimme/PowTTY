@@ -135,7 +135,7 @@ puttytel.rsp: makefile
 
 ##-- dependencies
 window.$(OBJ): window.c putty.h puttymem.h network.h win_res.h storage.h winstuff.h
-windlg.$(OBJ): windlg.c putty.h puttymem.h network.h ssh.h win_res.h winstuff.h
+windlg.$(OBJ): windlg.c putty.h puttymem.h network.h win_res.h winstuff.h
 winctrls.$(OBJ): winctrls.c winstuff.h winstuff.h
 be_nossh.$(OBJ): be_nossh.c
 version.$(OBJ): version.c
