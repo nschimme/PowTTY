@@ -46,7 +46,7 @@
 #
 ##--
 
-CFLAGS = /nologo /W3 /O2 /D_WINDOWS /D_CRT_SECURE_NO_WARNINGS /Fd
+CFLAGS = /nologo /W3 /MT /O2 /D_WINDOWS /D_CRT_SECURE_NO_WARNINGS /Fd
 # LFLAGS = /debug
 
 # Disable debug and incremental linking
