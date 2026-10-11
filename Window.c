@@ -831,8 +831,11 @@ font_messup:
     for (i=0; i<8; i++) {
 	if (fonts[i]) {
 	    if (SelectObject (hdc, fonts[i]) &&
-	        GetTextMetrics(hdc, &tm) )
-	         fsize[i] = tm.tmAveCharWidth + 256 * tm.tmHeight;
+	        GetTextMetrics(hdc, &tm) ) {
+	         SIZE sz;
+	         GetTextExtentPoint32(hdc, "M", 1, &sz);
+	         fsize[i] = sz.cx + 256 * tm.tmHeight;
+	    }
 	    else fsize[i] = -i;
 	}
 	else fsize[i] = -i;
