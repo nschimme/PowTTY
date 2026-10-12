@@ -695,10 +695,13 @@ static void init_palette(void) {
  *   ordinary one (manual underlining by means of line drawing can
  *   be done in a pinch).
  */
-static HFONT make_font(int height, int width, int weight, int charset, int underline, char *facename) {
+static HFONT make_font(HDC hdc, int height, int width, int weight, int charset, int underline, char *facename) {
     LOGFONT lf;
     memset(&lf, 0, sizeof(lf));
-    lf.lfHeight = height;
+    if (height > 0)
+        lf.lfHeight = -MulDiv(height, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+    else
+        lf.lfHeight = height;
     lf.lfWidth = width;
     lf.lfWeight = weight;
     lf.lfCharSet = charset;
@@ -740,7 +743,7 @@ font_messup:
     font_width = pick_width;
 
 #define f(i,c,w,u) \
-    fonts[i] = make_font(font_height, font_width, w, c, u, cfg.font)
+    fonts[i] = make_font(hdc, font_height, font_width, w, c, u, cfg.font)
 
     if (cfg.vtmode != VT_OEMONLY) {
 	f(FONT_NORMAL, cfg.fontcharset, fw_dontcare, FALSE);
