@@ -1720,7 +1720,14 @@ void do_text (Context ctx, int x, int y, char *text, int len,
     line_box.top    = y;
     line_box.right  = x+fnt_width*len;
     line_box.bottom = y+font_height;
-    ExtTextOut (hdc, x, y, ETO_CLIPPED|ETO_OPAQUE, &line_box, text, len, IpDx);
+    {
+        wchar_t *wbuf = (wchar_t *)smalloc((len + 1) * sizeof(wchar_t));
+        int wlen = MultiByteToWideChar(CP_UTF8, 0, text, len, wbuf, len);
+        if (wlen <= 0)
+            wlen = MultiByteToWideChar(CP_ACP, 0, text, len, wbuf, len);
+        ExtTextOutW (hdc, x, y, ETO_CLIPPED|ETO_OPAQUE, &line_box, wbuf, wlen > 0 ? wlen : len, IpDx);
+        sfree(wbuf);
+    }
     if (bold_mode == BOLD_SHADOW && (attr & ATTR_BOLD)) {
 	SetBkMode (hdc, TRANSPARENT);
 
@@ -1731,7 +1738,14 @@ void do_text (Context ctx, int x, int y, char *text, int len,
 	* Or ... I could do a test print with "W", and use +1 or -1 for this
 	* shift depending on if the leftmost column is blank...
 	*/
-        ExtTextOut (hdc, x-1, y, ETO_CLIPPED, &line_box, text, len, IpDx);
+        {
+        wchar_t *wbuf = (wchar_t *)smalloc((len + 1) * sizeof(wchar_t));
+        int wlen = MultiByteToWideChar(CP_UTF8, 0, text, len, wbuf, len);
+        if (wlen <= 0)
+            wlen = MultiByteToWideChar(CP_ACP, 0, text, len, wbuf, len);
+        ExtTextOutW (hdc, x-1, y, ETO_CLIPPED, &line_box, wbuf, wlen > 0 ? wlen : len, IpDx);
+        sfree(wbuf);
+    }
     }
     if (force_manual_underline || 
 	    (und_mode == UND_LINE && (attr & ATTR_UNDER))) {
