@@ -695,6 +695,23 @@ static void init_palette(void) {
  *   ordinary one (manual underlining by means of line drawing can
  *   be done in a pinch).
  */
+static HFONT make_font(int height, int width, int weight, int charset, int underline, char *facename) {
+    LOGFONT lf;
+    memset(&lf, 0, sizeof(lf));
+    lf.lfHeight = height;
+    lf.lfWidth = width;
+    lf.lfWeight = weight;
+    lf.lfCharSet = charset;
+    lf.lfUnderline = underline;
+    lf.lfOutPrecision = OUT_DEFAULT_PRECIS;
+    lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+    lf.lfQuality = DEFAULT_QUALITY;
+    lf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
+    strncpy(lf.lfFaceName, facename, sizeof(lf.lfFaceName) - 1);
+    lf.lfFaceName[sizeof(lf.lfFaceName) - 1] = 0;
+    return CreateFontIndirect(&lf);
+}
+
 static void init_fonts(int pick_width) {
     TEXTMETRIC tm;
     int i;
@@ -723,24 +740,15 @@ font_messup:
     font_width = pick_width;
 
 #define f(i,c,w,u) \
-    fonts[i] = CreateFont (font_height, font_width, 0, 0, w, FALSE, u, FALSE, \
-			   c, OUT_DEFAULT_PRECIS, \
-		           CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, \
-			   FIXED_PITCH | FF_DONTCARE, cfg.font)
+    fonts[i] = make_font(font_height, font_width, w, c, u, cfg.font)
 
     if (cfg.vtmode != VT_OEMONLY) {
-	SIZE sz;
 	f(FONT_NORMAL, cfg.fontcharset, fw_dontcare, FALSE);
 
 	SelectObject (hdc, fonts[FONT_NORMAL]);
 	GetTextMetrics(hdc, &tm); 
-	font_height = tm.tmHeight + tm.tmExternalLeading;
-	GetTextExtentPoint32(hdc, "M", 1, &sz);
-	font_width = sz.cx;
-
-	DeleteObject(fonts[FONT_NORMAL]);
-	f(FONT_NORMAL, cfg.fontcharset, fw_dontcare, FALSE);
-	SelectObject (hdc, fonts[FONT_NORMAL]);
+	font_height = tm.tmHeight;
+	font_width = tm.tmAveCharWidth;
 
 	f(FONT_UNDERLINE, cfg.fontcharset, fw_dontcare, TRUE);
 
@@ -805,18 +813,12 @@ font_messup:
     }
     else
     {
-	SIZE sz;
 	f(FONT_OEM, cfg.fontcharset, fw_dontcare, FALSE);
 
 	SelectObject (hdc, fonts[FONT_OEM]);
 	GetTextMetrics(hdc, &tm); 
-	font_height = tm.tmHeight + tm.tmExternalLeading;
-	GetTextExtentPoint32(hdc, "M", 1, &sz);
-	font_width = sz.cx;
-
-	DeleteObject(fonts[FONT_OEM]);
-	f(FONT_OEM, cfg.fontcharset, fw_dontcare, FALSE);
-	SelectObject (hdc, fonts[FONT_OEM]);
+	font_height = tm.tmHeight;
+	font_width = tm.tmAveCharWidth;
 
 	f(FONT_OEMUND, cfg.fontcharset, fw_dontcare, TRUE);
 
