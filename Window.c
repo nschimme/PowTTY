@@ -734,7 +734,7 @@ font_messup:
 	SelectObject (hdc, fonts[FONT_NORMAL]);
 	GetTextMetrics(hdc, &tm); 
 	font_height = tm.tmHeight;
-	{
+	if (pick_width == 0) {
 	    SIZE sz;
 	    font_width = tm.tmAveCharWidth;
 	    if (GetTextExtentPoint32(hdc, "M", 1, &sz) && sz.cx > font_width)
@@ -809,7 +809,7 @@ font_messup:
 	SelectObject (hdc, fonts[FONT_OEM]);
 	GetTextMetrics(hdc, &tm); 
 	font_height = tm.tmHeight;
-	{
+	if (pick_width == 0) {
 	    SIZE sz;
 	    font_width = tm.tmAveCharWidth;
 	    if (GetTextExtentPoint32(hdc, "M", 1, &sz) && sz.cx > font_width)
