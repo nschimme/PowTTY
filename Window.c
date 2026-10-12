@@ -723,7 +723,7 @@ font_messup:
     font_width = pick_width;
 
 #define f(i,c,w,u) \
-    fonts[i] = CreateFont (font_height, font_width, 0, 0, w, FALSE, u, FALSE, \
+    fonts[i] = CreateFont (font_height, pick_width, 0, 0, w, FALSE, u, FALSE, \
 			   c, OUT_DEFAULT_PRECIS, \
 		           CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, \
 			   FIXED_PITCH | FF_DONTCARE, cfg.font)
