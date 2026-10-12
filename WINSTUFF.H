@@ -2,6 +2,38 @@
  * winstuff.h: Windows-specific inter-module stuff.
  */
 
+#ifndef GWL_USERDATA
+#ifdef GWLP_USERDATA
+#define GWL_USERDATA GWLP_USERDATA
+#else
+#define GWL_USERDATA (-21)
+#endif
+#endif
+
+#ifndef GWL_HINSTANCE
+#ifdef GWLP_HINSTANCE
+#define GWL_HINSTANCE GWLP_HINSTANCE
+#else
+#define GWL_HINSTANCE (-6)
+#endif
+#endif
+
+#ifndef GWL_HWNDPARENT
+#ifdef GWLP_HWNDPARENT
+#define GWL_HWNDPARENT GWLP_HWNDPARENT
+#else
+#define GWL_HWNDPARENT (-8)
+#endif
+#endif
+
+#ifndef GWL_WNDPROC
+#ifdef GWLP_WNDPROC
+#define GWL_WNDPROC GWLP_WNDPROC
+#else
+#define GWL_WNDPROC (-4)
+#endif
+#endif
+
 /*
  * Global variables. Most modules declare these `extern', but
  * window.c will do `#define PUTTY_DO_GLOBALS' before including this

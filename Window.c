@@ -723,7 +723,7 @@ font_messup:
     font_width = pick_width;
 
 #define f(i,c,w,u) \
-    fonts[i] = CreateFont (font_height, font_width, 0, 0, w, FALSE, u, FALSE, \
+    fonts[i] = CreateFont (font_height, pick_width, 0, 0, w, FALSE, u, FALSE, \
 			   c, OUT_DEFAULT_PRECIS, \
 		           CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, \
 			   FIXED_PITCH | FF_DONTCARE, cfg.font)
@@ -734,7 +734,12 @@ font_messup:
 	SelectObject (hdc, fonts[FONT_NORMAL]);
 	GetTextMetrics(hdc, &tm); 
 	font_height = tm.tmHeight;
-	font_width = tm.tmAveCharWidth;
+	if (pick_width == 0) {
+	    SIZE sz;
+	    font_width = tm.tmAveCharWidth;
+	    if (GetTextExtentPoint32(hdc, "M", 1, &sz) && sz.cx > font_width)
+		font_width = sz.cx;
+	}
 
 	f(FONT_UNDERLINE, cfg.fontcharset, fw_dontcare, TRUE);
 
@@ -804,7 +809,12 @@ font_messup:
 	SelectObject (hdc, fonts[FONT_OEM]);
 	GetTextMetrics(hdc, &tm); 
 	font_height = tm.tmHeight;
-	font_width = tm.tmAveCharWidth;
+	if (pick_width == 0) {
+	    SIZE sz;
+	    font_width = tm.tmAveCharWidth;
+	    if (GetTextExtentPoint32(hdc, "M", 1, &sz) && sz.cx > font_width)
+		font_width = sz.cx;
+	}
 
 	f(FONT_OEMUND, cfg.fontcharset, fw_dontcare, TRUE);
 
@@ -1710,7 +1720,14 @@ void do_text (Context ctx, int x, int y, char *text, int len,
     line_box.top    = y;
     line_box.right  = x+fnt_width*len;
     line_box.bottom = y+font_height;
-    ExtTextOut (hdc, x, y, ETO_CLIPPED|ETO_OPAQUE, &line_box, text, len, IpDx);
+    {
+        wchar_t *wbuf = (wchar_t *)smalloc((len + 1) * sizeof(wchar_t));
+        int wlen = MultiByteToWideChar(CP_UTF8, 0, text, len, wbuf, len);
+        if (wlen <= 0)
+            wlen = MultiByteToWideChar(CP_ACP, 0, text, len, wbuf, len);
+        ExtTextOutW (hdc, x, y, ETO_CLIPPED|ETO_OPAQUE, &line_box, wbuf, wlen > 0 ? wlen : len, IpDx);
+        sfree(wbuf);
+    }
     if (bold_mode == BOLD_SHADOW && (attr & ATTR_BOLD)) {
 	SetBkMode (hdc, TRANSPARENT);
 
@@ -1721,7 +1738,14 @@ void do_text (Context ctx, int x, int y, char *text, int len,
 	* Or ... I could do a test print with "W", and use +1 or -1 for this
 	* shift depending on if the leftmost column is blank...
 	*/
-        ExtTextOut (hdc, x-1, y, ETO_CLIPPED, &line_box, text, len, IpDx);
+        {
+        wchar_t *wbuf = (wchar_t *)smalloc((len + 1) * sizeof(wchar_t));
+        int wlen = MultiByteToWideChar(CP_UTF8, 0, text, len, wbuf, len);
+        if (wlen <= 0)
+            wlen = MultiByteToWideChar(CP_ACP, 0, text, len, wbuf, len);
+        ExtTextOutW (hdc, x-1, y, ETO_CLIPPED, &line_box, wbuf, wlen > 0 ? wlen : len, IpDx);
+        sfree(wbuf);
+    }
     }
     if (force_manual_underline || 
 	    (und_mode == UND_LINE && (attr & ATTR_UNDER))) {

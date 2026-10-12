@@ -1,0 +1,43 @@
+name: MSVC Build
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+
+      - name: Build with NMake
+        run: nmake powtty.exe
+
+      - name: Upload powtty artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: powtty-exe
+          path: powtty.exe
+
+      - name: Create or update rolling beta release
+        if: github.event_name == 'push'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "beta"
+          name: "Beta Build"
+          body: "Rolling beta release with the latest changes."
+          prerelease: true
+          allowUpdates: true
+          recreateRelease: true
+          artifacts: "powtty.exe"
+          token: ${{ secrets.GITHUB_TOKEN }}

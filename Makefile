@@ -1,4 +1,4 @@
-# Visual C++ Makefile for PuTTY.
+# Visual C++ Makefile for PuTTY / PowTTY.
 #
 # Use `nmake' to build.
 #
@@ -46,11 +46,8 @@
 #
 ##--
 
-CFLAGS = /nologo /W3 /YX /O2 /Yd /D_WINDOWS /DDEBUG /ML /Fd
+CFLAGS = /nologo /W3 /MT /O2 /D_WINDOWS /D_CRT_SECURE_NO_WARNINGS /Fd
 # LFLAGS = /debug
-
-# Use MSVC DLL
-# CFLAGS = /nologo /W3 /YX /O2 /Yd /D_WINDOWS /DDEBUG /MD /Fd
 
 # Disable debug and incremental linking
 LFLAGS = /incremental:no
@@ -66,6 +63,9 @@ GOBJS1 = window.$(OBJ) windlg.$(OBJ) winctrls.$(OBJ) terminal.$(OBJ)
 GOBJS2 = xlat.$(OBJ) sizetip.$(OBJ)
 ##-- objects puttytel
 TOBJS = be_nossh.$(OBJ)
+TOBJS2 = ldisc.$(OBJ)
+##-- objects powtty
+POWOBJS = powbeam.$(OBJ) powcmd.$(OBJ) powcmd2.$(OBJ) powedit.$(OBJ) poweval.$(OBJ) powhook.$(OBJ) powlist.$(OBJ) powlog.$(OBJ) powmain.$(OBJ) powmap.$(OBJ) powptr.$(OBJ) powtty.$(OBJ) powutils.$(OBJ) raw.$(OBJ) regex.$(OBJ) telnet.$(OBJ) winnet.$(OBJ)
 ##-- resources putty puttytel
 PRESRC = win_res.$(RES)
 ##-- resources pageant
@@ -80,6 +80,7 @@ LRESRC = plink.$(RES)
 MOBJS = misc.$(OBJ) version.$(OBJ) winstore.$(OBJ) settings.$(OBJ)
 MOBJ2 = tree234.$(OBJ)
 ##-- gui-apps
+# powtty
 # putty
 # puttytel
 # pageant
@@ -95,7 +96,25 @@ LIBS3 = shell32.lib
 SOCK1 = wsock32.lib
 SOCK2 = ws2_32.lib
 
-all: putty.exe puttytel.exe pscp.exe plink.exe pageant.exe puttygen.exe
+all: powtty.exe puttytel.exe pscp.exe plink.exe pageant.exe puttygen.exe
+
+powtty.exe: $(GOBJS1) $(GOBJS2) $(TOBJS) $(TOBJS2) $(MOBJS) $(MOBJ2) $(POWOBJS) $(PRESRC) powtty.rsp
+	link $(LFLAGS) -out:powtty.exe -map:powtty.map @powtty.rsp
+
+powtty.rsp: makefile
+	echo /nologo /subsystem:windows > powtty.rsp
+	echo $(GOBJS1) >> powtty.rsp
+	echo $(GOBJS2) >> powtty.rsp
+	echo $(TOBJS) >> powtty.rsp
+	echo $(TOBJS2) >> powtty.rsp
+	echo $(MOBJS) >> powtty.rsp
+	echo $(MOBJ2) >> powtty.rsp
+	echo $(POWOBJS) >> powtty.rsp
+	echo $(PRESRC) >> powtty.rsp
+	echo $(LIBS1) >> powtty.rsp
+	echo $(LIBS2) >> powtty.rsp
+	echo $(LIBS3) >> powtty.rsp
+	echo $(SOCK2) >> powtty.rsp
 
 puttytel.exe: $(GOBJS1) $(GOBJS2) $(LOBJS1) $(TOBJS) $(MOBJS) $(MOBJ2) $(PRESRC) puttytel.rsp
 	link $(LFLAGS) -out:puttytel.exe -map:puttytel.map @puttytel.rsp
@@ -116,7 +135,7 @@ puttytel.rsp: makefile
 
 ##-- dependencies
 window.$(OBJ): window.c putty.h puttymem.h network.h win_res.h storage.h winstuff.h
-windlg.$(OBJ): windlg.c putty.h puttymem.h network.h ssh.h win_res.h winstuff.h
+windlg.$(OBJ): windlg.c putty.h puttymem.h network.h win_res.h winstuff.h
 winctrls.$(OBJ): winctrls.c winstuff.h winstuff.h
 be_nossh.$(OBJ): be_nossh.c
 version.$(OBJ): version.c
@@ -130,6 +149,21 @@ raw.$(OBJ): raw.c putty.h puttymem.h network.h
 ldisc.$(OBJ): ldisc.c putty.h puttymem.h network.h
 misc.$(OBJ): misc.c putty.h puttymem.h network.h
 tree234.$(OBJ): tree234.c tree234.h puttymem.h
+powbeam.$(OBJ): powbeam.c powbeam.h powdefines.h powmain.h powutils.h powmap.h powtty.h powedit.h poweval.h powhook.h putty.h
+powcmd.$(OBJ): powcmd.c
+powcmd2.$(OBJ): powcmd2.c
+powedit.$(OBJ): powedit.c
+poweval.$(OBJ): poweval.c
+powhook.$(OBJ): powhook.c
+powlist.$(OBJ): powlist.c
+powlog.$(OBJ): powlog.c
+powmain.$(OBJ): powmain.c
+powmap.$(OBJ): powmap.c
+powptr.$(OBJ): powptr.c
+powtty.$(OBJ): powtty.c
+powutils.$(OBJ): powutils.c
+regex.$(OBJ): regex.c regex.h
+winnet.$(OBJ): winnet.c
 
 ##--
 
